@@ -1,0 +1,19 @@
+# ninja log v5
+8	2667	6770910325822570	CMakeFiles/Receiver.dir/Receiver.cpp.obj	91f0a45da6b5cf0b
+2668	2970	6770910328849983	Receiver.exe	6f1b82814a190a34
+50	4072	6770892504572950	CMakeFiles/Receiver.dir/C_/Users/ivanu/CLionProjects/Operating_Systems/Lab_5/Server/Server.cpp.obj	4f67d899a773f9f6
+9	4079	6770892503964595	CMakeFiles/Receiver.dir/C_/Users/ivanu/CLionProjects/Operating_Systems/Lab_5/Client/Client.cpp.obj	bde9fd0a54585ec1
+8	2244	6770912194173583	CMakeFiles/Receiver.dir/Receiver.cpp.obj	91f0a45da6b5cf0b
+2245	2527	6770912196842314	Receiver.exe	6f1b82814a190a34
+8	2119	6770912730997393	CMakeFiles/Receiver.dir/Receiver.cpp.obj	91f0a45da6b5cf0b
+2120	2357	6770912733147839	Receiver.exe	6f1b82814a190a34
+8	1984	6770920044514130	CMakeFiles/Receiver.dir/Receiver.cpp.obj	91f0a45da6b5cf0b
+1985	2372	6770920048229952	Receiver.exe	6f1b82814a190a34
+7	2042	6770923587823552	CMakeFiles/Receiver.dir/Receiver.cpp.obj	91f0a45da6b5cf0b
+2043	2334	6770923590689128	Receiver.exe	6f1b82814a190a34
+8	2356	6770923887036839	CMakeFiles/Receiver.dir/Receiver.cpp.obj	91f0a45da6b5cf0b
+2357	2656	6770923889982839	Receiver.exe	6f1b82814a190a34
+9	2217	6770924695854764	CMakeFiles/Receiver.dir/Receiver.cpp.obj	91f0a45da6b5cf0b
+2218	2478	6770924698423872	Receiver.exe	6f1b82814a190a34
+6	2375	6770926098558384	CMakeFiles/Receiver.dir/Receiver.cpp.obj	91f0a45da6b5cf0b
+2376	2665	6770926101418750	Receiver.exe	6f1b82814a190a34
