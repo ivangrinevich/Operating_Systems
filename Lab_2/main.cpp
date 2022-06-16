@@ -37,8 +37,17 @@ DWORD WINAPI Min_max(LPVOID aa) {
     return 0;
 }
 
+DWORD WINAPI Average(LPVOID aa) {
+fun* a = (fun*)aa;
+cout << "Thread Average started" << "\n";
 
+for (int i = 0; i < a->size; i++) {
+a->average += a->vec[i];
+Sleep(12);
+}
+a->average = a->average / (double)(a->size);
+cout << "The average number is: " << a->average << "\n";
+cout << "Thread Average ended" << "\n";
+return 0;
 
-
-
-
+}
