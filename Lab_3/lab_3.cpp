@@ -1,131 +1,122 @@
 #include <iostream>
 #include <vector>
 #include <windows.h>
-
-using namespace std;
+#include <process.h>
+#include "Thread_Args.h"
+using std::cin;
 
 CRITICAL_SECTION cs;
-HANDLE* markedEvents;
-HANDLE* closeThreadEvents;
-HANDLE continueEvent;
-static vector<int> array;
+HANDLE startThreadsEvent;
+std::vector<HANDLE> threadEvents;
 
-DWORD WINAPI marker(LPVOID params_){
-    int number = *static_cast<int*>(params_);
-    int marked = 0;
-    srand(number);
 
+
+void printArray(int* arr, int n){
     EnterCriticalSection(&cs);
-    while(true) {
-        int random = rand();
-        random %= array.size();
-        if (array[random] == 0) {
+    for(int i = 0; i < n; i++){
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+    LeaveCriticalSection(&cs);
+}
+
+UINT WINAPI marker(void *p){
+    threadArgs* args = static_cast<threadArgs*>(p);
+    WaitForSingleObject(startThreadsEvent, INFINITE);
+    srand(args->num);
+    printf("Thread #%d started.\n", args->num);
+
+    int count = 0;
+    while(true){
+        EnterCriticalSection(&cs);
+        int i = rand() % args->n;
+        if(args->arr[i] == 0){
             Sleep(5);
-            array[random] = number;
-            Sleep(5);
-            marked++;
-        } else {
-            cout << "Poryadkoviy nomer: " << number <<std::endl;
-            cout << "Kolichestvo pomechennih elementov: " << marked <<std::endl;
-            cout << "Index elementa kotoriy nevozmojno pometit: " << random + 1 <<std::endl;
+            args->arr[i] = args->num;
+            ++count;
             LeaveCriticalSection(&cs);
-
-            SetEvent(markedEvents[number - 1]);
-
-            HANDLE* possibleOptions = new HANDLE[2];
-            possibleOptions[0] = continueEvent;
-            possibleOptions[1] = closeThreadEvents[number - 1];
-            DWORD option = WaitForMultipleObjects(2, possibleOptions, FALSE, INFINITE);
-            if (option == WAIT_OBJECT_0 + 1){
+            Sleep(5);
+        } else {
+            printf("Thread #%d. Marked %d elems. Unable to mark a[%d].\n", args->num, count, i);
+            LeaveCriticalSection(&cs);
+            SetEvent(threadEvents[args->num-1]);
+            int action = WaitForMultipleObjects(2,args->actions, FALSE, INFINITE) - WAIT_OBJECT_0;
+            if(action == 1){
+                for(int i = 0; i < args->n; i++){
+                    if(args->arr[i] == args->num){
+                        args->arr[i] = 0;
+                    }
+                }
+                printf("Thread #%d is terminated.\n", args->num);
                 break;
             }
         }
     }
-    for (int & i : array){
-        if (i == number)
-            i = 0;
-    }
-
-    return 0;
-}
-
-vector<HANDLE> start_threads(int count){
-    vector<HANDLE> threads_handles(count);
-    for (int i = 0; i < count; i++){
-        HANDLE hThread;
-        DWORD IDThread;
-        int* number = new int(i + 1);
-        hThread = CreateThread(
-                NULL,
-                0,
-                marker,
-                number,
-                0,
-                &IDThread);
-        if(hThread != NULL) {
-            cout << "Thread " << i + 1 << " created successfully" << endl;
-            threads_handles[i] = hThread;
-        }
-        else {
-            cout << "Something went wrong. Error code: " << GetLastError();
-        }
-    }
-    return threads_handles;
-}
-
-HANDLE* CreateEvents(int count, bool manualReset, bool initialState){
-    HANDLE* events = new HANDLE[count];
-    for (int i = 0; i < count; i++){
-        events[i] = CreateEventA(NULL, manualReset, initialState, NULL);
-    }
-    return events;
-}
-
-void showArray(vector<int>& v){
-    for (int i : v)
-        cout << i << " ";
-    cout << endl;
-}
-
-void SetRemovedEvents(vector<HANDLE>& removedEvents){
-    for (auto & removedEvent : removedEvents){
-        SetEvent(removedEvent);
-    }
+    return NULL;
 }
 
 int main() {
-
-    InitializeCriticalSection(&cs);
-
-    cout << "Enter array size: ";
-    int arr_size; cin >> arr_size;
-    array = vector<int>(arr_size, 0);
-
-    cout << "Enter markers count: ";
-    int marker_count; cin >> marker_count;
-
-    markedEvents = CreateEvents(marker_count, FALSE, FALSE);
-    continueEvent = CreateEventA(NULL, TRUE, FALSE, NULL);
-    closeThreadEvents = CreateEvents(marker_count, TRUE, FALSE);
-    vector<HANDLE> threads_handles = start_threads(marker_count);
-
-    vector<HANDLE> removedMarkedEvents;
-
-    int active_markers = marker_count;
-    while (active_markers != 0){
-        SetRemovedEvents(removedMarkedEvents);
-        WaitForMultipleObjects(marker_count, markedEvents, TRUE, INFINITE);
-        showArray(array);
-
-        cout << "Enter № of thread to be closed: " << endl;
-        int num; cin >> num;
-        SetEvent(closeThreadEvents[num - 1]);
-        WaitForSingleObject(threads_handles[num - 1], INFINITE);
-        removedMarkedEvents.push_back(markedEvents[num - 1]);
-        active_markers--;
-        PulseEvent(continueEvent);
+    //creating array
+    int n;
+    std::cout << "Enter number of elements in array";
+    std::cin >> n;
+    int* arr = new int[n];
+    for(int i = 0; i < n; i++){
+        arr[i] = 0;
     }
+    printf("Array of %d elements is created.\n", n);
 
-    cout << "RESULT ARRAY" << endl;
-    showArray(array);
+    //creating threads
+    int threadCount;
+    std::cout << "Enter number of threads";
+    std::cin >> threadCount;
+    startThreadsEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+    std::vector<HANDLE> threads;
+    HANDLE currThread;
+    std::vector<threadArgs*> argsVec;
+    threadArgs* currArgs;
+    bool* terminated = new bool[threadCount];
+    for(int i = 0; i < threadCount; i++){
+        currArgs = new threadArgs(arr, n, i+1);
+        currThread =
+                (HANDLE)_beginthreadex(NULL, 0, marker, currArgs, 0, NULL);
+        if(currThread == NULL) {
+            printf("Thread can't be created.\n");
+            return GetLastError();
+        }
+        terminated[i] = false;
+        threadEvents.push_back(CreateEvent(NULL, TRUE, FALSE, NULL));
+        argsVec.push_back(currArgs);
+        threads.push_back(currThread);
+    }
+    printf("%d threads are ready to start.\n" , threadCount);
+
+    //starting threads
+    InitializeCriticalSection(&cs);
+    PulseEvent(startThreadsEvent);
+    int terminatedCount = 0, k;
+    while(terminatedCount != threadCount) {
+        WaitForMultipleObjects(threadCount, &threadEvents[0], TRUE, INFINITE);
+        printArray(arr, n);
+        printf("All threads are paused. Which one is to terminate?\n");
+        cin >> k;
+        if(k <= 0 || k > threadCount || terminated[k - 1]){
+            printf("Invalid index. Try again.\n");
+            continue;
+        }
+        terminated[k-1] = true;
+        SetEvent(argsVec[k - 1]->actions[1]);
+        WaitForSingleObject(threads[k-1], INFINITE);
+        ++terminatedCount;
+        printArray(arr, n);
+        for(int i = 0; i < threadCount; ++i){
+            if(terminated[i])
+                continue;
+            ResetEvent(threadEvents[i]);
+            SetEvent(argsVec[i]->actions[0]);
+        }
+    }
+    DeleteCriticalSection(&cs);
+    delete[] arr;
+    return 0;
 }
