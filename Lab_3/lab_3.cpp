@@ -20,6 +20,7 @@ void printArray(int* arr, int n){
     LeaveCriticalSection(&cs);
 }
 
+
 UINT WINAPI marker(void *p){
     threadArgs* args = static_cast<threadArgs*>(p);
     WaitForSingleObject(startThreadsEvent, INFINITE);
