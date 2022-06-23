@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "Lab_3.exe"
+			"path" : "Lab_3_17.exe"
 		},
 		{
-			"path" : "Lab_3.pdb"
+			"path" : "Lab_3_17.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -41,7 +41,7 @@
 					"fragment" : "-g"
 				},
 				{
-					"fragment" : "-std=gnu++98"
+					"fragment" : "-std=gnu++17"
 				}
 			],
 			"language" : "CXX",
@@ -51,7 +51,7 @@
 				[
 					1
 				],
-				"standard" : "98"
+				"standard" : "17"
 			},
 			"sourceIndexes" : 
 			[
@@ -59,7 +59,7 @@
 			]
 		}
 	],
-	"id" : "Lab_3::@6890427a1f51a3e7e1df",
+	"id" : "Lab_3_17::@6890427a1f51a3e7e1df",
 	"link" : 
 	{
 		"commandFragments" : 
@@ -79,8 +79,8 @@
 		],
 		"language" : "CXX"
 	},
-	"name" : "Lab_3",
-	"nameOnDisk" : "Lab_3.exe",
+	"name" : "Lab_3_17",
+	"nameOnDisk" : "Lab_3_17.exe",
 	"paths" : 
 	{
 		"build" : ".",
@@ -94,6 +94,13 @@
 			[
 				0
 			]
+		},
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
+				1
+			]
 		}
 	],
 	"sources" : 
@@ -101,8 +108,13 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "lab_3.cpp",
+			"path" : "Lab_3_17.cpp",
 			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Thread_Args.h",
+			"sourceGroupIndex" : 1
 		}
 	],
 	"type" : "EXECUTABLE"
